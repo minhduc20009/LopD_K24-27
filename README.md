@@ -1,1 +1,268 @@
-# LopD_K24-27
+import json, html, os
+
+json_path="/mnt/data/Đã dán mã (1)(2).json"
+with open(json_path, encoding="utf-8") as f:
+    data=json.load(f)
+
+def esc(x):
+    return html.escape(str(x), quote=True)
+
+students=data["students"]
+photos=data["photos"]
+journal=data["journal"]
+events=data["events"]
+
+students_json=json.dumps(students, ensure_ascii=False)
+photos_json=json.dumps(photos, ensure_ascii=False)
+journal_json=json.dumps(journal, ensure_ascii=False)
+events_json=json.dumps(events, ensure_ascii=False)
+
+html_doc=f"""<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>12D • Thanh Xuân 2024–2027</title>
+<style>
+:root{{
+  --bg:#f6f7fb; --card:#fff; --text:#182033; --muted:#687086;
+  --primary:#6c5ce7; --primary2:#8b7cf6; --line:#e8eaf2;
+  --shadow:0 12px 35px rgba(35,42,70,.10); --radius:22px;
+}}
+*{{box-sizing:border-box}}
+html{{scroll-behavior:smooth}}
+body{{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--text)}}
+button,input,select{{font:inherit}}
+a{{color:inherit;text-decoration:none}}
+.container{{width:min(1180px,92%);margin:auto}}
+.hero{{min-height:460px;padding:30px 0 70px;background:linear-gradient(135deg,#171b38,#4c3fb0 55%,#8c7cf7);color:#fff;position:relative;overflow:hidden}}
+.hero:before,.hero:after{{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.08)}}
+.hero:before{{width:430px;height:430px;right:-100px;top:-180px}}
+.hero:after{{width:300px;height:300px;left:-140px;bottom:-170px}}
+.nav{{display:flex;align-items:center;justify-content:space-between;gap:20px;position:relative;z-index:2}}
+.logo{{font-weight:900;letter-spacing:.5px;font-size:21px}}
+.nav-links{{display:flex;gap:18px;flex-wrap:wrap}}
+.nav-links a{{opacity:.9;padding:8px 10px;border-radius:10px}}
+.nav-links a:hover{{background:rgba(255,255,255,.12)}}
+.hero-content{{position:relative;z-index:2;max-width:760px;padding-top:82px}}
+.kicker{{display:inline-flex;padding:8px 13px;border:1px solid rgba(255,255,255,.25);border-radius:999px;background:rgba(255,255,255,.1);font-weight:700}}
+h1{{font-size:clamp(44px,8vw,82px);line-height:.95;margin:18px 0}}
+.hero p{{font-size:19px;line-height:1.65;max-width:680px;color:#ececff}}
+.stats{{display:flex;gap:14px;flex-wrap:wrap;margin-top:28px}}
+.stat{{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);padding:13px 17px;border-radius:16px}}
+.stat b{{font-size:22px;display:block}}
+section{{padding:72px 0}}
+.section-head{{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:28px}}
+.section-head h2{{font-size:34px;margin:0}}
+.section-head p{{margin:7px 0 0;color:var(--muted)}}
+.toolbar{{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px}}
+input,select{{background:#fff;border:1px solid var(--line);padding:12px 15px;border-radius:13px;outline:none}}
+input{{min-width:260px;flex:1}}
+input:focus,select:focus{{border-color:var(--primary);box-shadow:0 0 0 3px rgba(108,92,231,.1)}}
+.grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}}
+.card{{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}}
+.student{{padding:20px;position:relative;transition:.2s}}
+.student:hover{{transform:translateY(-3px)}}
+.badge{{position:absolute;right:14px;top:14px;font-size:12px;background:#eeeaff;color:#5947d7;padding:5px 8px;border-radius:999px;font-weight:800}}
+.avatar{{width:64px;height:64px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(135deg,#e8e4ff,#f5f2ff);color:#5a48d5;font-size:22px;font-weight:900;margin-bottom:14px}}
+.student h3{{margin:0 0 5px;font-size:18px}}
+.meta{{color:var(--muted);font-size:13px;line-height:1.5}}
+.quote{{margin-top:14px;padding-top:14px;border-top:1px solid var(--line);font-size:13px;line-height:1.55;color:#4e566b;font-style:italic}}
+.photo-grid{{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}}
+.photo img{{width:100%;height:230px;object-fit:cover;display:block}}
+.photo-body{{padding:18px}}
+.photo-body h3{{margin:0 0 8px;font-size:18px}}
+.photo-body p{{color:var(--muted);line-height:1.55;font-size:14px}}
+.tags{{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}}
+.tag{{padding:5px 9px;border-radius:999px;background:#f0efff;color:#5947d7;font-size:12px;font-weight:700}}
+.timeline{{position:relative;display:grid;gap:18px}}
+.timeline:before{{content:"";position:absolute;left:15px;top:5px;bottom:5px;width:2px;background:#ded9ff}}
+.note{{position:relative;padding-left:48px}}
+.note:before{{content:"";position:absolute;left:7px;top:18px;width:18px;height:18px;border-radius:50%;background:var(--primary);border:4px solid #e8e5ff}}
+.note-card{{padding:22px}}
+.note-card h3{{margin:0 0 8px}}
+.note-card p{{white-space:pre-line;line-height:1.7;color:#50586c;margin:0}}
+.note-info{{font-size:13px;color:var(--muted);margin-bottom:13px}}
+.events{{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}}
+.event{{padding:20px}}
+.date{{font-weight:900;color:var(--primary);font-size:14px}}
+.event h3{{font-size:18px;margin:10px 0}}
+.event p{{color:var(--muted);line-height:1.55;font-size:14px}}
+footer{{padding:45px 0;background:#171b38;color:#cdd0e1;text-align:center}}
+.modal{{position:fixed;inset:0;background:rgba(10,12,25,.65);display:none;align-items:center;justify-content:center;padding:20px;z-index:20}}
+.modal.show{{display:flex}}
+.modal-box{{background:#fff;width:min(700px,100%);max-height:88vh;overflow:auto;border-radius:24px;padding:26px;position:relative}}
+.close{{position:absolute;right:15px;top:12px;border:0;background:#f0eff6;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:20px}}
+.empty{{grid-column:1/-1;padding:40px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:20px}}
+@media(max-width:950px){{.grid{{grid-template-columns:repeat(3,1fr)}}.photo-grid,.events{{grid-template-columns:repeat(2,1fr)}}}}
+@media(max-width:680px){{.nav-links{{display:none}}.hero-content{{padding-top:60px}}.grid,.photo-grid,.events{{grid-template-columns:1fr}}section{{padding:52px 0}}.section-head{{display:block}}}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="container">
+    <nav class="nav">
+      <div class="logo">12D • 2024–2027</div>
+      <div class="nav-links">
+        <a href="#members">Thành viên</a><a href="#memories">Kỷ niệm</a><a href="#journal">Lưu bút</a><a href="#events">Sự kiện</a>
+      </div>
+    </nav>
+    <div class="hero-content">
+      <span class="kicker">Niên khóa 2024 – 2027</span>
+      <h1>Thanh xuân của 12D</h1>
+      <p>Nơi lưu giữ những con người, khoảnh khắc, lời nhắn và những cột mốc đáng nhớ của tập thể 12D.</p>
+      <div class="stats">
+        <div class="stat"><b>{len(students)}</b> thành viên</div>
+        <div class="stat"><b>{len(photos)}</b> album</div>
+        <div class="stat"><b>{len(journal)}</b> lưu bút</div>
+        <div class="stat"><b>{len(events)}</b> sự kiện</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+<section id="members">
+  <div class="container">
+    <div class="section-head">
+      <div><h2>👥 Thành viên 12D</h2><p>Tìm kiếm theo tên, chức vụ hoặc trường đại học mơ ước.</p></div>
+    </div>
+    <div class="toolbar">
+      <input id="search" placeholder="🔎 Tìm tên thành viên...">
+      <select id="roleFilter"><option value="">Tất cả chức vụ</option></select>
+      <select id="highlightFilter"><option value="">Tất cả</option><option value="true">Nổi bật</option><option value="false">Thành viên khác</option></select>
+    </div>
+    <div id="studentGrid" class="grid"></div>
+  </div>
+</section>
+
+<section id="memories">
+  <div class="container">
+    <div class="section-head"><div><h2>📸 Kỷ niệm</h2><p>Những dấu mốc từ lớp 10 đến năm cuối cấp.</p></div></div>
+    <div id="photoGrid" class="photo-grid"></div>
+  </div>
+</section>
+
+<section id="journal">
+  <div class="container">
+    <div class="section-head"><div><h2>📖 Lưu bút</h2><p>Những lời nhắn được lưu lại cho thanh xuân 12D.</p></div></div>
+    <div id="journalList" class="timeline"></div>
+  </div>
+</section>
+
+<section id="events">
+  <div class="container">
+    <div class="section-head"><div><h2>📅 Sự kiện</h2><p>Các cột mốc quan trọng của niên khóa 2024–2027.</p></div></div>
+    <div id="eventGrid" class="events"></div>
+  </div>
+</section>
+</main>
+
+<footer>12D • Niên khóa 2024 – 2027 • Lưu giữ thanh xuân, viết tiếp tương lai ❤️</footer>
+
+<div id="modal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <button class="close" onclick="closeModal()">×</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const students = {students_json};
+const photos = {photos_json};
+const journal = {journal_json};
+const events = {events_json};
+
+const $ = s => document.querySelector(s);
+const initial = name => name.split(/\\s+/).filter(Boolean).map(x=>x[0]).slice(-2).join('').toUpperCase();
+
+function renderStudents(){{
+  const q = $('#search').value.toLowerCase().trim();
+  const role = $('#roleFilter').value;
+  const hi = $('#highlightFilter').value;
+  const list = students.filter(s =>
+    (!q || (s.fullName+' '+s.role+' '+s.dreamSchool).toLowerCase().includes(q)) &&
+    (!role || s.role===role) &&
+    (!hi || String(s.isHighlight)===hi)
+  );
+  $('#studentGrid').innerHTML = list.length ? list.map(s => `
+    <article class="card student" onclick="showStudent(${{s.id}})" style="cursor:pointer">
+      ${{s.isHighlight ? '<span class="badge">Nổi bật</span>' : ''}}
+      <div class="avatar">${{initial(s.fullName)}}</div>
+      <h3>${{escapeHtml(s.fullName)}}</h3>
+      <div class="meta">${{escapeHtml(s.role)}}<br>🎂 ${{formatDate(s.birthday)}}<br>🎓 ${{escapeHtml(s.dreamSchool)}}</div>
+      <div class="quote">“${{escapeHtml(s.quote)}}”</div>
+    </article>`).join('') : '<div class="empty">Không tìm thấy thành viên phù hợp.</div>';
+}}
+
+function renderPhotos(){{
+  $('#photoGrid').innerHTML = photos.map(p => `
+    <article class="card photo">
+      <img src="${{escapeHtml(p.imageUrl)}}" alt="${{escapeHtml(p.title)}}" loading="lazy">
+      <div class="photo-body">
+        <h3>${{escapeHtml(p.title)}}</h3>
+        <p>${{escapeHtml(p.description)}}</p>
+        <div class="tags"><span class="tag">Lớp ${{escapeHtml(p.grade)}}</span><span class="tag">${{escapeHtml(p.date)}}</span><span class="tag">❤️ ${{p.likes}}</span></div>
+      </div>
+    </article>`).join('');
+}}
+
+function renderJournal(){{
+  $('#journalList').innerHTML = journal.map(j => `
+    <article class="note">
+      <div class="card note-card">
+        <div class="note-info">📌 ${{escapeHtml(j.date)}} • ${{escapeHtml(j.authorName)}} • ${{j.moodEmoji}}</div>
+        <h3>${{escapeHtml(j.title)}}</h3>
+        <p>${{escapeHtml(j.content)}}</p>
+      </div>
+    </article>`).join('');
+}}
+
+function renderEvents(){{
+  const sorted=[...events].sort((a,b)=>a.date.localeCompare(b.date));
+  $('#eventGrid').innerHTML = sorted.map(e => `
+    <article class="card event">
+      <div class="date">${{formatDate(e.date)}} • ${{escapeHtml(e.time)}}</div>
+      <h3>${{escapeHtml(e.title)}}</h3>
+      <p>${{escapeHtml(e.description)}}</p>
+      <div class="meta">📍 ${{escapeHtml(e.location)}}<br>🏷️ ${{escapeHtml(e.category)}}${{e.isImportant?' • ⭐ Quan trọng':''}}</div>
+    </article>`).join('');
+}}
+
+function formatDate(s){{
+  const [y,m,d]=s.split('-'); return `${{d}}/${{m}}/${{y}}`;
+}}
+function escapeHtml(s){{
+  return String(s).replace(/[&<>"']/g, c => ({{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}}[c]));
+}}
+function showStudent(id){{
+  const s=students.find(x=>x.id===id);
+  $('#modalContent').innerHTML = `
+    <div class="avatar">${{initial(s.fullName)}}</div>
+    <h2 style="margin:0 0 8px">${{escapeHtml(s.fullName)}}</h2>
+    <p class="meta">${{escapeHtml(s.role)}} • 🎂 ${{formatDate(s.birthday)}}</p>
+    <hr style="border:0;border-top:1px solid var(--line);margin:20px 0">
+    <p><b>🎓 Trường đại học mơ ước</b><br>${{escapeHtml(s.dreamSchool)}}</p>
+    <p><b>💬 Lời nhắn</b><br>“${{escapeHtml(s.quote)}}”</p>`;
+  $('#modal').classList.add('show');
+}}
+function closeModal(){{$('#modal').classList.remove('show')}}
+document.addEventListener('keydown',e=>{{if(e.key==='Escape')closeModal()}});
+
+[...new Set(students.map(s=>s.role))].sort().forEach(r=>{{
+  const o=document.createElement('option'); o.value=r; o.textContent=r; $('#roleFilter').appendChild(o);
+}});
+$('#search').addEventListener('input',renderStudents);
+$('#roleFilter').addEventListener('change',renderStudents);
+$('#highlightFilter').addEventListener('change',renderStudents);
+
+renderStudents(); renderPhotos(); renderJournal(); renderEvents();
+</script>
+</body>
+</html>
+"""
+
+out="/mnt/data/12D_thanh_xuan_2024_2027.html"
+with open(out,"w",encoding="utf-8") as f:
+    f.write(html_doc)
+print(out)
